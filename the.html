@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="fotosdetodo/reyylogo.png" type="image/x-icon" />
+  <title>User getting owned</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link href="https://fonts.googleapis.com/css2?family=Sen&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Sen', Arial, sans-serif;
+      background-color: black;
+      margin: 1em;
+    }
+
+    h1 {
+      color: white;
+      text-align: center;
+      font-family: 'Sen', Arial, sans-serif;
+      font-size: 1.6em;
+      margin-bottom: 3em;
+    }
+
+    #content {
+      text-align: center;
+      padding: 10px;
+    }
+
+    .galery {
+      columns: 2 100px;
+      column-gap: 0.5em;
+      position: relative;
+    }
+
+    .galery img, .galery video {
+      border-radius: 5px;
+      max-width: 100%;
+      margin-bottom: .5em;
+      cursor: pointer;
+    }
+
+    .description {
+      font-family: 'Sen', Arial, sans-serif;
+      background-color: white;
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      border-radius: 20px;
+      border: black 1px solid;
+      color: black;
+      padding: 0.5em;
+      display: none;
+    }
+
+    .fullscreen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      background-color: rgba(0, 0, 0, 0.8);
+      /* Removed border-radius to avoid rounded edges in fullscreen */
+    }
+
+    .fullscreen img, .fullscreen video {
+      max-width: 90%;
+      max-height: 90%;
+      /* Removed border-radius to let content occupy full space */
+    }
+
+    .fullscreen .description {
+      position: absolute;
+      bottom: 10px;
+      color: white;
+      font-size: 1.2em;
+      background-color: rgba(0, 0, 0, 0.5);
+      padding: 10px;
+      border-radius: 5px;
+      width: 90%; /* Ensures the description doesn't overflow */
+      text-align: center;
+      display: block; /* Ensures the description is visible in fullscreen */
+    }
+
+    .fullscreen .description .more-text {
+      display: none;
+    }
+
+    .fullscreen .description .toggle-button {
+      color: #00f;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    /* Navigation Buttons */
+    .fullscreen .nav-button {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background-color: rgba(255, 255, 255, 0.3);
+      border: none;
+      color: white;
+      font-size: 2em;
+      padding: 0.5em;
+      cursor: pointer;
+      border-radius: 50%;
+    }
+
+    .fullscreen .prev-button {
+      left: 20px;
+    }
+
+    .fullscreen .next-button {
+      right: 20px;
+    }
+
+    body.fullscreen-enabled {
+      overflow: hidden;
+    }
+
+    /* Modificaciones en la barra de subida */
+    .upload-bar {
+      /* Ocultar la barra de subida por defecto */
+      display: none; /* Ensures the bar is hidden on page load */
+      /* Posicionar la barra de forma fija cerca del botón flotante */
+      position: fixed;
+      bottom: 80px; /* Adjust based on the size of the floating button */
+      right: 20px;
+      /* Make the bar responsive */
+      max-width: 90%;
+      width: 300px; /* Maximum width */
+      background-color: black;
+      padding: 10px;
+      border: 1px solid white;
+      border-radius: 15px;
+      flex-direction: column; /* Maintains adaptability */
+      align-items: flex-start;
+      box-sizing: border-box;
+      z-index: 10000; /* Ensures the bar is above other elements */
+    }
+
+    .upload-bar > * {
+      margin-bottom: 10px; /* Spacing between elements */
+      width: 100%; /* Ensures elements occupy full width */
+    }
+
+    .upload-bar input[type="file"] {
+      display: none;
+    }
+
+    .upload-float-button {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: white;
+      color: black;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+      z-index: 10000; /* Ensures the button is above other elements */
+    }
+
+    .upload-float-button i {
+      font-size: 1.5em;
+    }
+
+    .percentage {
+      font-size: 14px;
+      font-weight: bold;
+      color: white;
+      margin-left: 10px;
+    }
+
+    .file-description {
+      font-size: 1.2em;
+      font-weight: bold;
+      color: white;
+      background-color: rgba(0, 0, 0, 0.6);
+      padding: 10px;
+      border-radius: 5px;
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+    }
+
+    /* Nuevo estilo para mostrar el contador de archivos seleccionados */
+    .selected-count {
+      color: white;
+      font-size: 14px;
+      margin-top: -10px;
+      margin-bottom: 10px;
+    }
+
+    /* Estilos para los botones de navegación */
+    .nav-button {
+      opacity: 0.7;
+      transition: opacity 0.3s;
+    }
+
+    .nav-button:hover {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>User getting owned®</h1>
+
+  <div id="uploadedFiles" class="galery"></div>
+
+  <!-- Botón flotante para abrir la barra de subida -->
+  <div class="upload-float-button">
+    <i class="fas fa-upload"></i>
+  </div>
+
+  <!-- Barra de subida -->
+  <div class="upload-bar">
+    <input type="file" id="fileInput" accept="image/*,video/*" multiple> <!-- Added 'multiple' -->
+    <button id="selectFileButton">Seleccionar Archivo</button>
+    <div id="selectedCount" class="selected-count"></div> <!-- Selected files counter -->
+    <input type="text" id="fileDescription" placeholder="Agrega una descripción">
+    <button id="uploadButton">Subir</button>
+    <div class="percentage" id="percentage">0%</div>
+  </div>
+
+  <!-- Firebase JS -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+    import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-storage.js";
+    import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyA_USvfSXAqZf7hQhJCon0WulnrrINB7cI",
+      authDomain: "the-pic-c437e.firebaseapp.com",
+      projectId: "the-pic-c437e",
+      storageBucket: "the-pic-c437e.appspot.com",
+      messagingSenderId: "750954597180",
+      appId: "1:750954597180:web:d7b67c6b60f4d3bb17ec39"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const storage = getStorage(app);
+    const db = getFirestore(app);
+
+    document.getElementById('selectFileButton').addEventListener('click', () => {
+      document.getElementById('fileInput').click();
+    });
+
+    // Mostrar el contador de archivos seleccionados
+    document.getElementById('fileInput').addEventListener('change', () => {
+      const selectedCount = document.getElementById('fileInput').files.length;
+      document.getElementById('selectedCount').textContent = selectedCount + " archivo(s) seleccionado(s)";
+    });
+
+    document.getElementById('uploadButton').addEventListener('click', async () => {
+      const fileInput = document.getElementById('fileInput');
+      const fileDescription = document.getElementById('fileDescription').value;
+      const files = fileInput.files;
+
+      if (files.length > 0) {
+        let uploadedCount = 0;
+        for (let i = 0; i < files.length; i++) {
+          const file = files[i];
+          const storageRef = ref(storage, 'uploads/' + Date.now() + '_' + file.name);
+          const uploadTask = uploadBytesResumable(storageRef, file);
+
+          uploadTask.on('state_changed', (snapshot) => {
+            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            document.getElementById('percentage').textContent = Math.floor(progress) + '%';
+          }, (error) => {
+            alert('Hubo un error al subir el archivo: ' + file.name);
+          }, async () => {
+            const fileURL = await getDownloadURL(uploadTask.snapshot.ref);
+            await addDoc(collection(db, "uploads"), {
+              url: fileURL,
+              type: file.type,
+              description: fileDescription
+            });
+            uploadedCount++;
+            if (uploadedCount === files.length) {
+              alert('Todos los archivos fueron subidos con éxito');
+              mostrarArchivosSubidos();
+              fileInput.value = '';
+              document.getElementById('fileDescription').value = ''; // Limpiar el input de texto
+              document.getElementById('percentage').textContent = '0%'; // Reiniciar el porcentaje
+              document.getElementById('selectedCount').textContent = ''; // Limpiar el contador
+            }
+          });
+        }
+      } else {
+        alert('Por favor selecciona al menos un archivo');
+      }
+    });
+
+    // Array global para almacenar los archivos
+    let archivos = [];
+
+    async function mostrarArchivosSubidos() {
+      const filesDiv = document.getElementById('uploadedFiles');
+      filesDiv.innerHTML = '';
+      archivos = []; // Reiniciar el array
+      try {
+        const querySnapshot = await getDocs(collection(db, "uploads"));
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          const fileUrl = data.url;
+          const fileType = data.type || 'image/jpeg';
+          const fileDescription = data.description || '';
+
+          archivos.push({ url: fileUrl, type: fileType, description: fileDescription });
+
+          const fileItem = document.createElement('div');
+          fileItem.classList.add('file-item');
+
+          if (fileType.startsWith('image/')) {
+            const img = document.createElement('img');
+            img.src = fileUrl;
+            img.alt = "Imagen subida";
+            img.addEventListener('click', () => mostrarEnPantallaCompleta(archivos.length - 1));
+            fileItem.appendChild(img);
+          } else if (fileType.startsWith('video/')) {
+            const video = document.createElement('video');
+            video.src = fileUrl;
+            video.controls = true;
+            video.addEventListener('click', () => mostrarEnPantallaCompleta(archivos.length - 1));
+            fileItem.appendChild(video);
+          }
+
+          filesDiv.appendChild(fileItem);
+        });
+      } catch (error) {
+        alert('Hubo un error al obtener los archivos. Por favor, intenta nuevamente.');
+      }
+    }
+
+    function mostrarEnPantallaCompleta(index) {
+      const fullscreenDiv = document.createElement('div');
+      fullscreenDiv.classList.add('fullscreen');
+
+      const archivo = archivos[index];
+      let content;
+      if (archivo.type.startsWith('image/')) {
+        content = document.createElement('img');
+        content.src = archivo.url;
+      } else if (archivo.type.startsWith('video/')) {
+        content = document.createElement('video');
+        content.src = archivo.url;
+        content.controls = true;
+        content.autoplay = true;
+      }
+
+      const descDiv = document.createElement('div');
+      descDiv.classList.add('description');
+
+      // Truncate description and add "Ver más"
+      const maxLength = 100; // Maximum characters to display
+      if (archivo.description.length > maxLength) {
+        const visibleText = archivo.description.substring(0, maxLength);
+        const hiddenText = archivo.description.substring(maxLength);
+
+        descDiv.innerHTML = `
+          ${visibleText}<span class="more-text">${hiddenText}</span>
+          <span class="toggle-button">Ver más</span>
+        `;
+      } else {
+        descDiv.textContent = archivo.description;
+      }
+
+      // Añadir botones de navegación
+      const prevButton = document.createElement('button');
+      prevButton.classList.add('nav-button', 'prev-button');
+      prevButton.innerHTML = '&#10094;'; // Left arrow
+      prevButton.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (index > 0) {
+          document.body.removeChild(fullscreenDiv);
+          mostrarEnPantallaCompleta(index - 1);
+        }
+      });
+
+      const nextButton = document.createElement('button');
+      nextButton.classList.add('nav-button', 'next-button');
+      nextButton.innerHTML = '&#10095;'; // Right arrow
+      nextButton.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (index < archivos.length - 1) {
+          document.body.removeChild(fullscreenDiv);
+          mostrarEnPantallaCompleta(index + 1);
+        }
+      });
+
+      // Event listener para "Ver más"
+      descDiv.addEventListener('click', (e) => {
+        if (e.target.classList.contains('toggle-button')) {
+          const moreText = descDiv.querySelector('.more-text');
+          const toggleButton = descDiv.querySelector('.toggle-button');
+          if (moreText.style.display === 'none' || !moreText.style.display) {
+            moreText.style.display = 'inline';
+            toggleButton.textContent = 'Ver menos';
+          } else {
+            moreText.style.display = 'none';
+            toggleButton.textContent = 'Ver más';
+          }
+        }
+      });
+
+      fullscreenDiv.appendChild(content);
+      fullscreenDiv.appendChild(descDiv);
+      fullscreenDiv.appendChild(prevButton);
+      fullscreenDiv.appendChild(nextButton);
+
+      document.body.appendChild(fullscreenDiv);
+      document.body.classList.add('fullscreen-enabled');
+
+      fullscreenDiv.addEventListener('click', () => {
+        document.body.removeChild(fullscreenDiv);
+        document.body.classList.remove('fullscreen-enabled');
+      });
+
+      // Evitar que los clics en contenido no cierren el fullscreen
+      content.addEventListener('click', (e) => {
+        e.stopPropagation();
+      });
+
+      descDiv.addEventListener('click', (e) => {
+        e.stopPropagation();
+      });
+    }
+
+    document.querySelector('.upload-float-button').addEventListener('click', () => {
+      const uploadBar = document.querySelector('.upload-bar');
+      if (uploadBar.style.display === 'flex') {
+        uploadBar.style.display = 'none';
+      } else {
+        uploadBar.style.display = 'flex';
+      }
+    });
+
+    window.addEventListener('load', mostrarArchivosSubidos);
+  </script>
+
+</body>
+</html>
