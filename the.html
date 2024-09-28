@@ -64,13 +64,11 @@
       align-items: center;
       z-index: 9999;
       background-color: rgba(0, 0, 0, 0.8);
-      /* Removido border-radius para evitar bordes redondeados en pantalla completa */
     }
 
     .fullscreen img, .fullscreen video {
       max-width: 90%;
-      max-height: 90%;
-      /* Removido border-radius para que el contenido ocupe todo el espacio */
+      max-height: 70%; /* Ajuste para dejar espacio para descripciones y botones */
     }
 
     .fullscreen .description {
@@ -81,39 +79,35 @@
       background-color: rgba(0, 0, 0, 0.5);
       padding: 10px;
       border-radius: 5px;
-      width: 90%; /* Asegura que la descripción no se desborde */
+      width: 90%;
       text-align: center;
-      display: block; /* Asegura que la descripción se muestre en pantalla completa */
+      display: none; /* Oculta la descripción inicialmente */
     }
 
     body.fullscreen-enabled {
       overflow: hidden;
     }
 
-    /* Modificaciones en la barra de subida */
     .upload-bar {
-      /* Ocultar la barra de subida por defecto */
-      display: none; /* Asegura que la barra esté oculta al cargar la página */
-      /* Posicionar la barra de forma fija cerca del botón flotante */
+      display: none;
       position: fixed;
-      bottom: 80px; /* Ajusta según el tamaño del botón flotante */
+      bottom: 80px;
       right: 20px;
-      /* Hacer que la barra sea responsiva */
       max-width: 90%;
-      width: 300px; /* Ancho máximo */
+      width: 300px;
       background-color: black;
       padding: 10px;
       border: 1px solid white;
       border-radius: 15px;
-      flex-direction: column; /* Mantiene la adaptabilidad */
+      flex-direction: column;
       align-items: flex-start;
       box-sizing: border-box;
-      z-index: 10000; /* Asegura que la barra esté por encima de otros elementos */
+      z-index: 10000;
     }
 
     .upload-bar > * {
-      margin-bottom: 10px; /* Espaciado entre elementos */
-      width: 100%; /* Asegura que los elementos ocupen el ancho completo */
+      margin-bottom: 10px;
+      width: 100%;
     }
 
     .upload-bar input[type="file"] {
@@ -134,7 +128,7 @@
       align-items: center;
       cursor: pointer;
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-      z-index: 10000; /* Asegura que el botón esté por encima de otros elementos */
+      z-index: 10000;
     }
 
     .upload-float-button i {
@@ -160,13 +154,71 @@
       right: 10px;
     }
 
-    /* Nuevo estilo para mostrar el contador de archivos seleccionados */
     .selected-count {
       color: white;
       font-size: 14px;
       margin-top: -10px;
       margin-bottom: 10px;
     }
+
+    /* Nuevos estilos añadidos para las funcionalidades solicitadas */
+
+    .buttons-container {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .fullscreen-button {
+      background-color: rgba(255, 255, 255, 0.8);
+      border: none;
+      padding: 8px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1em;
+    }
+
+    .fullscreen-button:hover {
+      background-color: rgba(255, 255, 255, 1);
+    }
+
+    .ver-mas-button {
+      /* Opcional: estilos específicos para "Ver más" si se requiere */
+    }
+
+    .comentarios-modal {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 80%;
+      max-height: 70%;
+      background-color: rgba(0, 0, 0, 0.9);
+      color: white;
+      padding: 20px;
+      border-radius: 10px;
+      overflow-y: auto;
+      z-index: 10001;
+    }
+
+    .cerrar-comentarios-button {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: red;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .comentarios-list p {
+      margin-bottom: 10px;
+    }
+
   </style>
 </head>
 <body>
@@ -175,16 +227,14 @@
 
   <div id="uploadedFiles" class="galery"></div>
 
-  <!-- Botón flotante para abrir la barra de subida -->
   <div class="upload-float-button">
     <i class="fas fa-upload"></i>
   </div>
 
-  <!-- Barra de subida -->
   <div class="upload-bar">
-    <input type="file" id="fileInput" accept="image/*,video/*" multiple> <!-- Agregado 'multiple' -->
+    <input type="file" id="fileInput" accept="image/*,video/*" multiple>
     <button id="selectFileButton">Seleccionar Archivo</button>
-    <div id="selectedCount" class="selected-count"></div> <!-- Contador de archivos seleccionados -->
+    <div id="selectedCount" class="selected-count"></div>
     <input type="text" id="fileDescription" placeholder="Agrega una descripción">
     <button id="uploadButton">Subir</button>
     <div class="percentage" id="percentage">0%</div>
@@ -192,150 +242,234 @@
 
   <!-- Firebase JS -->
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
-    import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-storage.js";
-    import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+    // Firebase JS
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-storage.js";
+import { getFirestore, collection, addDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyA_USvfSXAqZf7hQhJCon0WulnrrINB7cI",
-      authDomain: "the-pic-c437e.firebaseapp.com",
-      projectId: "the-pic-c437e",
-      storageBucket: "the-pic-c437e.appspot.com",
-      messagingSenderId: "750954597180",
-      appId: "1:750954597180:web:d7b67c6b60f4d3bb17ec39"
-    };
+const firebaseConfig = {
+  apiKey: "AIzaSyA_USvfSXAqZf7hQhJCon0WulnrrINB7cI",
+  authDomain: "the-pic-c437e.firebaseapp.com",
+  projectId: "the-pic-c437e",
+  storageBucket: "the-pic-c437e.appspot.com",
+  messagingSenderId: "750954597180",
+  appId: "1:750954597180:web:d7b67c6b60f4d3bb17ec39"
+};
 
-    const app = initializeApp(firebaseConfig);
-    const storage = getStorage(app);
-    const db = getFirestore(app);
+const app = initializeApp(firebaseConfig);
+const storage = getStorage(app);
+const db = getFirestore(app);
 
-    document.getElementById('selectFileButton').addEventListener('click', () => {
-      document.getElementById('fileInput').click();
-    });
+document.getElementById('selectFileButton').addEventListener('click', () => {
+  document.getElementById('fileInput').click();
+});
 
-    // Mostrar el contador de archivos seleccionados
-    document.getElementById('fileInput').addEventListener('change', () => {
-      const selectedCount = document.getElementById('fileInput').files.length;
-      document.getElementById('selectedCount').textContent = selectedCount + " archivo(s) seleccionado(s)";
-    });
+document.getElementById('fileInput').addEventListener('change', () => {
+  const selectedCount = document.getElementById('fileInput').files.length;
+  document.getElementById('selectedCount').textContent = selectedCount + " archivo(s) seleccionado(s)";
+});
 
-    document.getElementById('uploadButton').addEventListener('click', async () => {
-      const fileInput = document.getElementById('fileInput');
-      const fileDescription = document.getElementById('fileDescription').value;
-      const files = fileInput.files;
+document.getElementById('uploadButton').addEventListener('click', async () => {
+  const fileInput = document.getElementById('fileInput');
+  const fileDescription = document.getElementById('fileDescription').value;
+  const files = fileInput.files;
 
-      if (files.length > 0) {
-        let uploadedCount = 0;
-        for (let i = 0; i < files.length; i++) {
-          const file = files[i];
-          const storageRef = ref(storage, 'uploads/' + Date.now() + '_' + file.name);
-          const uploadTask = uploadBytesResumable(storageRef, file);
+  if (files.length > 0) {
+    let uploadedCount = 0;
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const storageRef = ref(storage, 'uploads/' + Date.now() + '_' + file.name);
+      const uploadTask = uploadBytesResumable(storageRef, file);
 
-          uploadTask.on('state_changed', (snapshot) => {
-            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-            document.getElementById('percentage').textContent = Math.floor(progress) + '%';
-          }, (error) => {
-            alert('Hubo un error al subir el archivo: ' + file.name);
-          }, async () => {
-            const fileURL = await getDownloadURL(uploadTask.snapshot.ref);
-            await addDoc(collection(db, "uploads"), {
-              url: fileURL,
-              type: file.type,
-              description: fileDescription
-            });
-            uploadedCount++;
-            if (uploadedCount === files.length) {
-              alert('Todos los archivos fueron subidos con éxito');
-              mostrarArchivosSubidos();
-              fileInput.value = '';
-              document.getElementById('fileDescription').value = ''; // Limpiar el input de texto
-              document.getElementById('percentage').textContent = '0%'; // Reiniciar el porcentaje
-              document.getElementById('selectedCount').textContent = ''; // Limpiar el contador
-            }
-          });
-        }
-      } else {
-        alert('Por favor selecciona al menos un archivo');
-      }
-    });
-
-    async function mostrarArchivosSubidos() {
-      const filesDiv = document.getElementById('uploadedFiles');
-      filesDiv.innerHTML = '';
-      try {
-        const querySnapshot = await getDocs(collection(db, "uploads"));
-        querySnapshot.forEach((doc) => {
-          const data = doc.data();
-          const fileUrl = data.url;
-          const fileType = data.type || 'image/jpeg';
-          const fileDescription = data.description || '';
-
-          const fileItem = document.createElement('div');
-          fileItem.classList.add('file-item');
-
-          if (fileType.startsWith('image/')) {
-            const img = document.createElement('img');
-            img.src = fileUrl;
-            img.alt = "Imagen subida";
-            img.addEventListener('click', () => mostrarEnPantallaCompleta(fileUrl, 'image', fileDescription));
-            fileItem.appendChild(img);
-          } else if (fileType.startsWith('video/')) {
-            const video = document.createElement('video');
-            video.src = fileUrl;
-            video.controls = true;
-            video.addEventListener('click', () => mostrarEnPantallaCompleta(fileUrl, 'video', fileDescription));
-            fileItem.appendChild(video);
-          }
-
-          filesDiv.appendChild(fileItem);
+      uploadTask.on('state_changed', (snapshot) => {
+        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        document.getElementById('percentage').textContent = Math.floor(progress) + '%';
+      }, (error) => {
+        alert('Hubo un error al subir el archivo: ' + file.name);
+      }, async () => {
+        const fileURL = await getDownloadURL(uploadTask.snapshot.ref);
+        await addDoc(collection(db, "uploads"), {
+          url: fileURL,
+          type: file.type,
+          description: fileDescription
         });
-      } catch (error) {
-        alert('Hubo un error al obtener los archivos. Por favor, intenta nuevamente.');
-      }
-    }
-
-    function mostrarEnPantallaCompleta(url, type, description) {
-      const fullscreenDiv = document.createElement('div');
-      fullscreenDiv.classList.add('fullscreen');
-
-      let content;
-      if (type === 'image') {
-        content = document.createElement('img');
-        content.src = url;
-      } else if (type === 'video') {
-        content = document.createElement('video');
-        content.src = url;
-        content.controls = true;
-        content.autoplay = true;
-      }
-
-      const descDiv = document.createElement('div');
-      descDiv.classList.add('description');
-      descDiv.textContent = description;
-
-      fullscreenDiv.appendChild(content);
-      fullscreenDiv.appendChild(descDiv);
-
-      document.body.appendChild(fullscreenDiv);
-      document.body.classList.add('fullscreen-enabled');
-
-      fullscreenDiv.addEventListener('click', () => {
-        document.body.removeChild(fullscreenDiv);
-        document.body.classList.remove('fullscreen-enabled');
+        uploadedCount++;
+        if (uploadedCount === files.length) {
+          alert('Todos los archivos fueron subidos con éxito');
+          mostrarArchivosSubidos();
+          fileInput.value = '';
+          document.getElementById('fileDescription').value = '';
+          document.getElementById('percentage').textContent = '0%';
+          document.getElementById('selectedCount').textContent = '';
+        }
       });
     }
+  } else {
+    alert('Por favor selecciona al menos un archivo');
+  }
+});
 
-    document.querySelector('.upload-float-button').addEventListener('click', () => {
-      const uploadBar = document.querySelector('.upload-bar');
-      if (uploadBar.style.display === 'flex') {
-        uploadBar.style.display = 'none';
-      } else {
-        uploadBar.style.display = 'flex';
-      }
+async function mostrarArchivosSubidos() {
+  const galery = document.getElementById('uploadedFiles');
+  galery.innerHTML = ''; // Limpiamos la galería antes de mostrar los archivos
+
+  const q = query(collection(db, "uploads"));
+  const querySnapshot = await getDocs(q);
+  querySnapshot.forEach((doc) => {
+    const fileData = doc.data();
+    let mediaElement;
+
+    // Verificamos si es una imagen o un video
+    if (fileData.type.startsWith('image/')) {
+      mediaElement = document.createElement('img');
+      mediaElement.src = fileData.url;
+    } else if (fileData.type.startsWith('video/')) {
+      mediaElement = document.createElement('video');
+      mediaElement.src = fileData.url;
+      mediaElement.controls = true; // Para que los videos tengan controles
+    }
+
+    const descriptionDiv = document.createElement('div');
+    descriptionDiv.classList.add('description');
+    descriptionDiv.textContent = fileData.description;
+
+    const mediaContainer = document.createElement('div');
+    mediaContainer.style.position = 'relative';
+    mediaContainer.appendChild(mediaElement);
+    mediaContainer.appendChild(descriptionDiv);
+
+    mediaElement.addEventListener('click', () => abrirPantallaCompleta(mediaElement, fileData.description, doc.id));
+
+    galery.appendChild(mediaContainer);
+  });
+}
+
+// Función para abrir un archivo en pantalla completa
+function abrirPantallaCompleta(mediaElement, description, docId) {
+  const fullscreenDiv = document.createElement('div');
+  fullscreenDiv.classList.add('fullscreen');
+
+  const clonedMedia = mediaElement.cloneNode(true);
+  if (clonedMedia.tagName.toLowerCase() === 'video') {
+    clonedMedia.style.maxHeight = '70%'; // Reducir tamaño para videos
+  } else {
+    clonedMedia.style.maxHeight = '80%';
+  }
+  fullscreenDiv.appendChild(clonedMedia);
+
+  // Descripción inicialmente oculta
+  const descriptionDiv = document.createElement('div');
+  descriptionDiv.classList.add('description');
+  descriptionDiv.textContent = description;
+  descriptionDiv.style.display = 'none'; // Ocultar inicialmente
+  fullscreenDiv.appendChild(descriptionDiv);
+
+  // Contenedor para los botones
+  const buttonsContainer = document.createElement('div');
+  buttonsContainer.classList.add('buttons-container');
+  fullscreenDiv.appendChild(buttonsContainer);
+
+  // Botón "Dejar comentario"
+  const commentButton = document.createElement('button');
+  commentButton.textContent = 'Dejar comentario';
+  commentButton.classList.add('fullscreen-button');
+  buttonsContainer.appendChild(commentButton);
+
+  commentButton.addEventListener('click', (e) => {
+    e.stopPropagation(); // Evitar que el click cierre la pantalla completa
+    dejarComentario(docId);
+  });
+
+  // Botón "Ver comentarios"
+  const verComentariosButton = document.createElement('button');
+  verComentariosButton.textContent = 'Ver comentarios';
+  verComentariosButton.classList.add('fullscreen-button');
+  buttonsContainer.appendChild(verComentariosButton);
+
+  verComentariosButton.addEventListener('click', (e) => {
+    e.stopPropagation();
+    mostrarComentarios(docId, fullscreenDiv);
+  });
+
+  // Botón "Ver más"
+  const verMasButton = document.createElement('button');
+  verMasButton.textContent = 'Ver más';
+  verMasButton.classList.add('fullscreen-button', 'ver-mas-button');
+  buttonsContainer.appendChild(verMasButton);
+
+  verMasButton.addEventListener('click', (e) => {
+    e.stopPropagation();
+    descriptionDiv.style.display = descriptionDiv.style.display === 'block' ? 'none' : 'block';
+  });
+
+  document.body.appendChild(fullscreenDiv);
+  document.body.classList.add('fullscreen-enabled');
+
+  fullscreenDiv.addEventListener('click', () => {
+    document.body.removeChild(fullscreenDiv);
+    document.body.classList.remove('fullscreen-enabled');
+  });
+
+  cargarComentarios(docId, fullscreenDiv);
+}
+
+// Función para dejar un comentario
+async function dejarComentario(docId) {
+  const comentario = prompt("Escribe tu comentario:");
+  if (comentario) {
+    await addDoc(collection(db, "comentarios"), {
+      fileId: docId, // Asocia el comentario con el archivo (media) específico
+      comentario: comentario,
+      timestamp: new Date()
     });
+    alert('Comentario guardado.');
+  }
+}
 
-    window.addEventListener('load', mostrarArchivosSubidos);
+// Mostrar comentarios con scroll si es necesario
+async function mostrarComentarios(docId, fullscreenDiv) {
+  // Verificar si ya existe la ventana de comentarios
+  if (fullscreenDiv.querySelector('.comentarios-modal')) return;
+
+  const comentariosDiv = document.createElement('div');
+  comentariosDiv.classList.add('comentarios-modal');
+
+  const cerrarButton = document.createElement('button');
+  cerrarButton.textContent = 'Cerrar';
+  cerrarButton.classList.add('cerrar-comentarios-button');
+  comentariosDiv.appendChild(cerrarButton);
+
+  cerrarButton.addEventListener('click', (e) => {
+    e.stopPropagation();
+    fullscreenDiv.removeChild(comentariosDiv); // Cierra la ventana de comentarios
+  });
+
+  const comentariosList = document.createElement('div');
+  comentariosList.classList.add('comentarios-list');
+  comentariosDiv.appendChild(comentariosList);
+
+  const q = query(collection(db, "comentarios"), where("fileId", "==", docId)); // Filtra por el ID del archivo
+  const querySnapshot = await getDocs(q);
+
+  querySnapshot.forEach((doc) => {
+    const comentarioData = doc.data();
+    const comentarioP = document.createElement('p');
+    comentarioP.textContent = comentarioData.comentario; // Muestra cada comentario
+    comentariosList.appendChild(comentarioP);
+  });
+
+  fullscreenDiv.appendChild(comentariosDiv);
+}
+
+// Cargar los archivos al inicio
+mostrarArchivosSubidos();
+
+// Mostrar u ocultar barra de subida
+const uploadButton = document.querySelector('.upload-float-button');
+const uploadBar = document.querySelector('.upload-bar');
+uploadButton.addEventListener('click', () => {
+  uploadBar.style.display = uploadBar.style.display === 'flex' ? 'none' : 'flex';
+});
   </script>
-
 </body>
 </html>
