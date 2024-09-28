@@ -64,13 +64,13 @@
       align-items: center;
       z-index: 9999;
       background-color: rgba(0, 0, 0, 0.8);
-      /* Removed border-radius to avoid rounded edges in fullscreen */
+      /* Removido border-radius para evitar bordes redondeados en pantalla completa */
     }
 
     .fullscreen img, .fullscreen video {
       max-width: 90%;
       max-height: 90%;
-      /* Removed border-radius to let content occupy full space */
+      /* Removido border-radius para que el contenido ocupe todo el espacio */
     }
 
     .fullscreen .description {
@@ -81,41 +81,9 @@
       background-color: rgba(0, 0, 0, 0.5);
       padding: 10px;
       border-radius: 5px;
-      width: 90%; /* Ensures the description doesn't overflow */
+      width: 90%; /* Asegura que la descripción no se desborde */
       text-align: center;
-      display: block; /* Ensures the description is visible in fullscreen */
-    }
-
-    .fullscreen .description .more-text {
-      display: none;
-    }
-
-    .fullscreen .description .toggle-button {
-      color: #00f;
-      cursor: pointer;
-      text-decoration: underline;
-    }
-
-    /* Navigation Buttons */
-    .fullscreen .nav-button {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      background-color: rgba(255, 255, 255, 0.3);
-      border: none;
-      color: white;
-      font-size: 2em;
-      padding: 0.5em;
-      cursor: pointer;
-      border-radius: 50%;
-    }
-
-    .fullscreen .prev-button {
-      left: 20px;
-    }
-
-    .fullscreen .next-button {
-      right: 20px;
+      display: block; /* Asegura que la descripción se muestre en pantalla completa */
     }
 
     body.fullscreen-enabled {
@@ -125,27 +93,27 @@
     /* Modificaciones en la barra de subida */
     .upload-bar {
       /* Ocultar la barra de subida por defecto */
-      display: none; /* Ensures the bar is hidden on page load */
+      display: none; /* Asegura que la barra esté oculta al cargar la página */
       /* Posicionar la barra de forma fija cerca del botón flotante */
       position: fixed;
-      bottom: 80px; /* Adjust based on the size of the floating button */
+      bottom: 80px; /* Ajusta según el tamaño del botón flotante */
       right: 20px;
-      /* Make the bar responsive */
+      /* Hacer que la barra sea responsiva */
       max-width: 90%;
-      width: 300px; /* Maximum width */
+      width: 300px; /* Ancho máximo */
       background-color: black;
       padding: 10px;
       border: 1px solid white;
       border-radius: 15px;
-      flex-direction: column; /* Maintains adaptability */
+      flex-direction: column; /* Mantiene la adaptabilidad */
       align-items: flex-start;
       box-sizing: border-box;
-      z-index: 10000; /* Ensures the bar is above other elements */
+      z-index: 10000; /* Asegura que la barra esté por encima de otros elementos */
     }
 
     .upload-bar > * {
-      margin-bottom: 10px; /* Spacing between elements */
-      width: 100%; /* Ensures elements occupy full width */
+      margin-bottom: 10px; /* Espaciado entre elementos */
+      width: 100%; /* Asegura que los elementos ocupen el ancho completo */
     }
 
     .upload-bar input[type="file"] {
@@ -166,7 +134,7 @@
       align-items: center;
       cursor: pointer;
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-      z-index: 10000; /* Ensures the button is above other elements */
+      z-index: 10000; /* Asegura que el botón esté por encima de otros elementos */
     }
 
     .upload-float-button i {
@@ -199,21 +167,11 @@
       margin-top: -10px;
       margin-bottom: 10px;
     }
-
-    /* Estilos para los botones de navegación */
-    .nav-button {
-      opacity: 0.7;
-      transition: opacity 0.3s;
-    }
-
-    .nav-button:hover {
-      opacity: 1;
-    }
   </style>
 </head>
 <body>
 
-  <h1>User getting owned</h1>
+  <h1>User getting owned®</h1>
 
   <div id="uploadedFiles" class="galery"></div>
 
@@ -224,9 +182,9 @@
 
   <!-- Barra de subida -->
   <div class="upload-bar">
-    <input type="file" id="fileInput" accept="image/*,video/*" multiple> <!-- Added 'multiple' -->
+    <input type="file" id="fileInput" accept="image/*,video/*" multiple> <!-- Agregado 'multiple' -->
     <button id="selectFileButton">Seleccionar Archivo</button>
-    <div id="selectedCount" class="selected-count"></div> <!-- Selected files counter -->
+    <div id="selectedCount" class="selected-count"></div> <!-- Contador de archivos seleccionados -->
     <input type="text" id="fileDescription" placeholder="Agrega una descripción">
     <button id="uploadButton">Subir</button>
     <div class="percentage" id="percentage">0%</div>
@@ -301,13 +259,9 @@
       }
     });
 
-    // Array global para almacenar los archivos
-    let archivos = [];
-
     async function mostrarArchivosSubidos() {
       const filesDiv = document.getElementById('uploadedFiles');
       filesDiv.innerHTML = '';
-      archivos = []; // Reiniciar el array
       try {
         const querySnapshot = await getDocs(collection(db, "uploads"));
         querySnapshot.forEach((doc) => {
@@ -316,8 +270,6 @@
           const fileType = data.type || 'image/jpeg';
           const fileDescription = data.description || '';
 
-          archivos.push({ url: fileUrl, type: fileType, description: fileDescription });
-
           const fileItem = document.createElement('div');
           fileItem.classList.add('file-item');
 
@@ -325,13 +277,13 @@
             const img = document.createElement('img');
             img.src = fileUrl;
             img.alt = "Imagen subida";
-            img.addEventListener('click', () => mostrarEnPantallaCompleta(archivos.length - 1));
+            img.addEventListener('click', () => mostrarEnPantallaCompleta(fileUrl, 'image', fileDescription));
             fileItem.appendChild(img);
           } else if (fileType.startsWith('video/')) {
             const video = document.createElement('video');
             video.src = fileUrl;
             video.controls = true;
-            video.addEventListener('click', () => mostrarEnPantallaCompleta(archivos.length - 1));
+            video.addEventListener('click', () => mostrarEnPantallaCompleta(fileUrl, 'video', fileDescription));
             fileItem.appendChild(video);
           }
 
@@ -342,81 +294,27 @@
       }
     }
 
-    function mostrarEnPantallaCompleta(index) {
+    function mostrarEnPantallaCompleta(url, type, description) {
       const fullscreenDiv = document.createElement('div');
       fullscreenDiv.classList.add('fullscreen');
 
-      const archivo = archivos[index];
       let content;
-      if (archivo.type.startsWith('image/')) {
+      if (type === 'image') {
         content = document.createElement('img');
-        content.src = archivo.url;
-      } else if (archivo.type.startsWith('video/')) {
+        content.src = url;
+      } else if (type === 'video') {
         content = document.createElement('video');
-        content.src = archivo.url;
+        content.src = url;
         content.controls = true;
         content.autoplay = true;
       }
 
       const descDiv = document.createElement('div');
       descDiv.classList.add('description');
-
-      // Truncate description and add "Ver más"
-      const maxLength = 100; // Maximum characters to display
-      if (archivo.description.length > maxLength) {
-        const visibleText = archivo.description.substring(0, maxLength);
-        const hiddenText = archivo.description.substring(maxLength);
-
-        descDiv.innerHTML = `
-          ${visibleText}<span class="more-text">${hiddenText}</span>
-          <span class="toggle-button">Ver más</span>
-        `;
-      } else {
-        descDiv.textContent = archivo.description;
-      }
-
-      // Añadir botones de navegación
-      const prevButton = document.createElement('button');
-      prevButton.classList.add('nav-button', 'prev-button');
-      prevButton.innerHTML = '&#10094;'; // Left arrow
-      prevButton.addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (index > 0) {
-          document.body.removeChild(fullscreenDiv);
-          mostrarEnPantallaCompleta(index - 1);
-        }
-      });
-
-      const nextButton = document.createElement('button');
-      nextButton.classList.add('nav-button', 'next-button');
-      nextButton.innerHTML = '&#10095;'; // Right arrow
-      nextButton.addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (index < archivos.length - 1) {
-          document.body.removeChild(fullscreenDiv);
-          mostrarEnPantallaCompleta(index + 1);
-        }
-      });
-
-      // Event listener para "Ver más"
-      descDiv.addEventListener('click', (e) => {
-        if (e.target.classList.contains('toggle-button')) {
-          const moreText = descDiv.querySelector('.more-text');
-          const toggleButton = descDiv.querySelector('.toggle-button');
-          if (moreText.style.display === 'none' || !moreText.style.display) {
-            moreText.style.display = 'inline';
-            toggleButton.textContent = 'Ver menos';
-          } else {
-            moreText.style.display = 'none';
-            toggleButton.textContent = 'Ver más';
-          }
-        }
-      });
+      descDiv.textContent = description;
 
       fullscreenDiv.appendChild(content);
       fullscreenDiv.appendChild(descDiv);
-      fullscreenDiv.appendChild(prevButton);
-      fullscreenDiv.appendChild(nextButton);
 
       document.body.appendChild(fullscreenDiv);
       document.body.classList.add('fullscreen-enabled');
@@ -424,15 +322,6 @@
       fullscreenDiv.addEventListener('click', () => {
         document.body.removeChild(fullscreenDiv);
         document.body.classList.remove('fullscreen-enabled');
-      });
-
-      // Evitar que los clics en contenido no cierren el fullscreen
-      content.addEventListener('click', (e) => {
-        e.stopPropagation();
-      });
-
-      descDiv.addEventListener('click', (e) => {
-        e.stopPropagation();
       });
     }
 
