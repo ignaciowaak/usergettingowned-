@@ -199,7 +199,7 @@
       transform: translate(-50%, -50%);
       width: 80%;
       max-height: 70%;
-      background-color: rgba(0, 0, 0, 0.9);
+      background-color: rgba(0, 0, 0, 1.9);
       color: white;
       padding: 20px;
       border-radius: 10px;
@@ -211,8 +211,8 @@
       position: absolute;
       top: 10px;
       right: 10px;
-      background-color: red;
-      border: none;
+      background-color: white;
+      border: 1px solid white;
       padding: 5px 10px;
       border-radius: 5px;
       cursor: pointer;
@@ -245,234 +245,235 @@
 
   <!-- Firebase JS -->
   <script type="module">
-  // Firebase JS
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
-  import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-storage.js";
-  import { getFirestore, collection, addDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+// Firebase JS
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-storage.js";
+import { getFirestore, collection, addDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyA_USvfSXAqZf7hQhJCon0WulnrrINB7cI",
-    authDomain: "the-pic-c437e.firebaseapp.com",
-    projectId: "the-pic-c437e",
-    storageBucket: "the-pic-c437e.appspot.com",
-    messagingSenderId: "750954597180",
-    appId: "1:750954597180:web:d7b67c6b60f4d3bb17ec39"
-  };
+const firebaseConfig = {
+  apiKey: "AIzaSyA_USvfSXAqZf7hQhJCon0WulnrrINB7cI",
+  authDomain: "the-pic-c437e.firebaseapp.com",
+  projectId: "the-pic-c437e",
+  storageBucket: "the-pic-c437e.appspot.com",
+  messagingSenderId: "750954597180",
+  appId: "1:750954597180:web:d7b67c6b60f4d3bb17ec39"
+};
 
-  const app = initializeApp(firebaseConfig);
-  const storage = getStorage(app);
-  const db = getFirestore(app);
+const app = initializeApp(firebaseConfig);
+const storage = getStorage(app);
+const db = getFirestore(app);
 
-  document.getElementById('selectFileButton').addEventListener('click', () => {
-    document.getElementById('fileInput').click();
-  });
+document.getElementById('selectFileButton').addEventListener('click', () => {
+  document.getElementById('fileInput').click();
+});
 
-  document.getElementById('fileInput').addEventListener('change', () => {
-    const selectedCount = document.getElementById('fileInput').files.length;
-    document.getElementById('selectedCount').textContent = selectedCount + " archivo(s) seleccionado(s)";
-  });
+document.getElementById('fileInput').addEventListener('change', () => {
+  const selectedCount = document.getElementById('fileInput').files.length;
+  document.getElementById('selectedCount').textContent = selectedCount + " archivo(s) seleccionado(s)";
+});
 
-  document.getElementById('uploadButton').addEventListener('click', async () => {
-    const fileInput = document.getElementById('fileInput');
-    const fileDescription = document.getElementById('fileDescription').value;
-    const files = fileInput.files;
+document.getElementById('uploadButton').addEventListener('click', async () => {
+  const fileInput = document.getElementById('fileInput');
+  const fileDescription = document.getElementById('fileDescription').value;
+  const files = fileInput.files;
 
-    if (files.length > 0) {
-      let uploadedCount = 0;
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        const storageRef = ref(storage, 'uploads/' + Date.now() + '_' + file.name);
-        const uploadTask = uploadBytesResumable(storageRef, file);
+  if (files.length > 0) {
+    let uploadedCount = 0;
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const storageRef = ref(storage, 'uploads/' + Date.now() + '_' + file.name);
+      const uploadTask = uploadBytesResumable(storageRef, file);
 
-        uploadTask.on('state_changed', (snapshot) => {
-          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          document.getElementById('percentage').textContent = Math.floor(progress) + '%';
-        }, (error) => {
-          alert('Hubo un error al subir el archivo: ' + file.name);
-        }, async () => {
-          const fileURL = await getDownloadURL(uploadTask.snapshot.ref);
-          await addDoc(collection(db, "uploads"), {
-            url: fileURL,
-            type: file.type,
-            description: fileDescription
-          });
-          uploadedCount++;
-          if (uploadedCount === files.length) {
-            alert('Todos los archivos fueron subidos con éxito');
-            mostrarArchivosSubidos();
-            fileInput.value = '';
-            document.getElementById('fileDescription').value = '';
-            document.getElementById('percentage').textContent = '0%';
-            document.getElementById('selectedCount').textContent = '';
-          }
+      uploadTask.on('state_changed', (snapshot) => {
+        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        document.getElementById('percentage').textContent = Math.floor(progress) + '%';
+      }, (error) => {
+        alert('Hubo un error al subir el archivo: ' + file.name);
+      }, async () => {
+        const fileURL = await getDownloadURL(uploadTask.snapshot.ref);
+        await addDoc(collection(db, "uploads"), {
+          url: fileURL,
+          type: file.type,
+          description: fileDescription
         });
-      }
-    } else {
-      alert('Por favor selecciona al menos un archivo');
+        uploadedCount++;
+        if (uploadedCount === files.length) {
+          alert('Todos los archivos fueron subidos con éxito');
+          mostrarArchivosSubidos();
+          fileInput.value = '';
+          document.getElementById('fileDescription').value = '';
+          document.getElementById('percentage').textContent = '0%';
+          document.getElementById('selectedCount').textContent = '';
+        }
+      });
     }
-  });
-
-  async function mostrarArchivosSubidos() {
-    const galery = document.getElementById('uploadedFiles');
-    galery.innerHTML = ''; // Limpiamos la galería antes de mostrar los archivos
-
-    const q = query(collection(db, "uploads"));
-    const querySnapshot = await getDocs(q);
-    querySnapshot.forEach((doc) => {
-      const fileData = doc.data();
-      let mediaElement;
-
-      // Verificamos si es una imagen o un video
-      if (fileData.type.startsWith('image/')) {
-        mediaElement = document.createElement('img');
-        mediaElement.src = fileData.url;
-      } else if (fileData.type.startsWith('video/')) {
-        mediaElement = document.createElement('video');
-        mediaElement.src = fileData.url;
-        mediaElement.controls = true; // Para que los videos tengan controles
-      }
-
-      const descriptionDiv = document.createElement('div');
-      descriptionDiv.classList.add('description');
-      descriptionDiv.textContent = fileData.description;
-
-      const mediaContainer = document.createElement('div');
-      mediaContainer.style.position = 'relative';
-      mediaContainer.appendChild(mediaElement);
-      mediaContainer.appendChild(descriptionDiv);
-
-      mediaElement.addEventListener('click', () => abrirPantallaCompleta(mediaElement, fileData.description, doc.id));
-
-      galery.appendChild(mediaContainer);
-    });
+  } else {
+    alert('Por favor selecciona al menos un archivo');
   }
+});
 
-  // Función para abrir un archivo en pantalla completa
-  function abrirPantallaCompleta(mediaElement, description, docId) {
-    const fullscreenDiv = document.createElement('div');
-    fullscreenDiv.classList.add('fullscreen');
+async function mostrarArchivosSubidos() {
+  const galery = document.getElementById('uploadedFiles');
+  galery.innerHTML = ''; // Limpiamos la galería antes de mostrar los archivos
 
-    const clonedMedia = mediaElement.cloneNode(true);
-    if (clonedMedia.tagName.toLowerCase() === 'video') {
-      clonedMedia.style.maxHeight = '70%'; // Reducir tamaño para videos
-    } else {
-      clonedMedia.style.maxHeight = '80%';
+  const q = query(collection(db, "uploads"));
+  const querySnapshot = await getDocs(q);
+  querySnapshot.forEach((doc) => {
+    const fileData = doc.data();
+    let mediaElement;
+
+    // Verificamos si es una imagen o un video
+    if (fileData.type.startsWith('image/')) {
+      mediaElement = document.createElement('img');
+      mediaElement.src = fileData.url;
+    } else if (fileData.type.startsWith('video/')) {
+      mediaElement = document.createElement('video');
+      mediaElement.src = fileData.url;
+      mediaElement.controls = true; // Para que los videos tengan controles
     }
-    fullscreenDiv.appendChild(clonedMedia);
 
-    // Descripción inicialmente oculta
     const descriptionDiv = document.createElement('div');
     descriptionDiv.classList.add('description');
-    descriptionDiv.textContent = description;
-    descriptionDiv.style.display = 'none'; // Ocultar inicialmente
-    fullscreenDiv.appendChild(descriptionDiv);
+    descriptionDiv.textContent = fileData.description;
 
-    // Contenedor para los botones
-    const buttonsContainer = document.createElement('div');
-    buttonsContainer.classList.add('buttons-container');
-    fullscreenDiv.appendChild(buttonsContainer);
+    const mediaContainer = document.createElement('div');
+    mediaContainer.style.position = 'relative';
+    mediaContainer.appendChild(mediaElement);
+    mediaContainer.appendChild(descriptionDiv);
 
-    // Botón "Dejar comentario"
-    const commentButton = document.createElement('button');
-    commentButton.textContent = 'Dejar comentario';
-    commentButton.classList.add('fullscreen-button');
-    buttonsContainer.appendChild(commentButton);
+    mediaElement.addEventListener('click', () => abrirPantallaCompleta(mediaElement, fileData.description, doc.id));
 
-    commentButton.addEventListener('click', (e) => {
-      e.stopPropagation(); // Evitar que el click cierre la pantalla completa
-      dejarComentario(docId);
-    });
+    galery.appendChild(mediaContainer);
+  });
+}
 
-    // Botón "Ver comentarios"
-    const verComentariosButton = document.createElement('button');
-    verComentariosButton.textContent = 'Ver comentarios';
-    verComentariosButton.classList.add('fullscreen-button');
-    buttonsContainer.appendChild(verComentariosButton);
+// Función para abrir un archivo en pantalla completa
+function abrirPantallaCompleta(mediaElement, description, docId) {
+  const fullscreenDiv = document.createElement('div');
+  fullscreenDiv.classList.add('fullscreen');
 
-    verComentariosButton.addEventListener('click', (e) => {
-      e.stopPropagation();
-      mostrarComentarios(docId, fullscreenDiv);
-    });
-
-    // Botón "Ver más"
-    const verMasButton = document.createElement('button');
-    verMasButton.textContent = 'Ver más';
-    verMasButton.classList.add('fullscreen-button', 'ver-mas-button');
-    buttonsContainer.appendChild(verMasButton);
-
-    verMasButton.addEventListener('click', (e) => {
-      e.stopPropagation();
-      descriptionDiv.style.display = descriptionDiv.style.display === 'block' ? 'none' : 'block';
-    });
-
-    document.body.appendChild(fullscreenDiv);
-    document.body.classList.add('fullscreen-enabled');
-
-    fullscreenDiv.addEventListener('click', () => {
-      document.body.removeChild(fullscreenDiv);
-      document.body.classList.remove('fullscreen-enabled');
-    });
-
-    cargarComentarios(docId, fullscreenDiv);
+  const clonedMedia = mediaElement.cloneNode(true);
+  if (clonedMedia.tagName.toLowerCase() === 'video') {
+    clonedMedia.style.maxHeight = '70%'; // Reducir tamaño para videos
+  } else {
+    clonedMedia.style.maxHeight = '80%';
   }
+  fullscreenDiv.appendChild(clonedMedia);
 
-  // Función para dejar un comentario
-  async function dejarComentario(docId) {
-    const comentario = prompt("Escribe tu comentario:");
-    if (comentario) {
-      await addDoc(collection(db, "comentarios"), {
-        fileId: docId, // Asocia el comentario con el archivo (media) específico
-        comentario: comentario,
-        timestamp: new Date()
-      });
-      alert('Comentario guardado.');
-    }
-  }
+  // Descripción inicialmente oculta
+  const descriptionDiv = document.createElement('div');
+  descriptionDiv.classList.add('description');
+  descriptionDiv.textContent = description;
+  descriptionDiv.style.display = 'none'; // Ocultar inicialmente
+  fullscreenDiv.appendChild(descriptionDiv);
 
-  // Mostrar comentarios con scroll si es necesario
-  async function mostrarComentarios(docId, fullscreenDiv) {
-    // Verificar si ya existe la ventana de comentarios
-    if (fullscreenDiv.querySelector('.comentarios-modal')) return;
+  // Contenedor para los botones
+  const buttonsContainer = document.createElement('div');
+  buttonsContainer.classList.add('buttons-container');
+  fullscreenDiv.appendChild(buttonsContainer);
 
-    const comentariosDiv = document.createElement('div');
-    comentariosDiv.classList.add('comentarios-modal');
+  // Botón "Dejar comentario"
+  const commentButton = document.createElement('button');
+  commentButton.textContent = 'Dejar comentario';
+  commentButton.classList.add('fullscreen-button');
+  buttonsContainer.appendChild(commentButton);
 
-    const cerrarButton = document.createElement('button');
-    cerrarButton.textContent = 'Cerrar';
-    cerrarButton.classList.add('cerrar-comentarios-button');
-    comentariosDiv.appendChild(cerrarButton);
+  commentButton.addEventListener('click', (e) => {
+    e.stopPropagation(); // Evitar que el click cierre la pantalla completa
+    dejarComentario(docId);
+  });
 
-    cerrarButton.addEventListener('click', (e) => {
-      e.stopPropagation();
-      fullscreenDiv.removeChild(comentariosDiv); // Cierra la ventana de comentarios
+  // Botón "Ver comentarios"
+  const verComentariosButton = document.createElement('button');
+  verComentariosButton.textContent = 'Ver comentarios';
+  verComentariosButton.classList.add('fullscreen-button');
+  buttonsContainer.appendChild(verComentariosButton);
+
+  verComentariosButton.addEventListener('click', (e) => {
+    e.stopPropagation();
+    mostrarComentarios(docId, fullscreenDiv);
+  });
+
+  // Botón "Ver más"
+  const verMasButton = document.createElement('button');
+  verMasButton.textContent = 'Ver más';
+  verMasButton.classList.add('fullscreen-button', 'ver-mas-button');
+  buttonsContainer.appendChild(verMasButton);
+
+  verMasButton.addEventListener('click', (e) => {
+    e.stopPropagation();
+    descriptionDiv.style.display = descriptionDiv.style.display === 'block' ? 'none' : 'block';
+  });
+
+  document.body.appendChild(fullscreenDiv);
+  document.body.classList.add('fullscreen-enabled');
+
+  fullscreenDiv.addEventListener('click', () => {
+    document.body.removeChild(fullscreenDiv);
+    document.body.classList.remove('fullscreen-enabled');
+  });
+
+  // Eliminar la llamada a cargarComentarios ya que no está definida
+  // cargarComentarios(docId, fullscreenDiv);
+}
+
+// Función para dejar un comentario
+async function dejarComentario(docId) {
+  const comentario = prompt("Escribe tu comentario:");
+  if (comentario) {
+    await addDoc(collection(db, "comentarios"), {
+      fileId: docId, // Asocia el comentario con el archivo (media) específico
+      comentario: comentario,
+      timestamp: new Date()
     });
-
-    const comentariosList = document.createElement('div');
-    comentariosList.classList.add('comentarios-list');
-    comentariosDiv.appendChild(comentariosList);
-
-    const q = query(collection(db, "comentarios"), where("fileId", "==", docId)); // Filtra por el ID del archivo
-    const querySnapshot = await getDocs(q);
-
-    querySnapshot.forEach((doc) => {
-      const comentarioData = doc.data();
-      const comentarioP = document.createElement('p');
-      comentarioP.textContent = comentarioData.comentario; // Muestra cada comentario
-      comentariosList.appendChild(comentarioP);
-    });
-
-    fullscreenDiv.appendChild(comentariosDiv);
+    alert('Comentario guardado.');
   }
+}
 
-  // Cargar los archivos al inicio
-  mostrarArchivosSubidos();
+// Mostrar comentarios con scroll si es necesario
+async function mostrarComentarios(docId, fullscreenDiv) {
+  // Verificar si ya existe la ventana de comentarios
+  if (fullscreenDiv.querySelector('.comentarios-modal')) return;
 
-  // Mostrar u ocultar barra de subida
-  const uploadButton = document.querySelector('.upload-float-button');
-  const uploadBar = document.querySelector('.upload-bar');
-  uploadButton.addEventListener('click', () => {
-        uploadBar.style.display 
-        = uploadBar.style.display === 'flex' ? 'none' : 'flex';
+  const comentariosDiv = document.createElement('div');
+  comentariosDiv.classList.add('comentarios-modal');
+
+  const cerrarButton = document.createElement('button');
+  cerrarButton.textContent = 'Cerrar';
+  cerrarButton.classList.add('cerrar-comentarios-button');
+  comentariosDiv.appendChild(cerrarButton);
+
+  cerrarButton.addEventListener('click', (e) => {
+    e.stopPropagation();
+    fullscreenDiv.removeChild(comentariosDiv); // Cierra la ventana de comentarios
+  });
+
+  const comentariosList = document.createElement('div');
+  comentariosList.classList.add('comentarios-list');
+  comentariosDiv.appendChild(comentariosList);
+
+  const q = query(collection(db, "comentarios"), where("fileId", "==", docId)); // Filtra por el ID del archivo
+  const querySnapshot = await getDocs(q);
+
+  querySnapshot.forEach((doc) => {
+    const comentarioData = doc.data();
+    const comentarioP = document.createElement('p');
+    comentarioP.textContent = comentarioData.comentario; // Muestra cada comentario
+    comentariosList.appendChild(comentarioP);
+  });
+
+  fullscreenDiv.appendChild(comentariosDiv);
+}
+
+// Cargar los archivos al inicio
+mostrarArchivosSubidos();
+
+// Mostrar u ocultar barra de subida
+const uploadButton = document.querySelector('.upload-float-button');
+const uploadBar = document.querySelector('.upload-bar');
+uploadButton.addEventListener('click', () => {
+      uploadBar.style.display 
+      = uploadBar.style.display === 'flex' ? 'none' : 'flex';
 });
 </script>
 </body>
