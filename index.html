@@ -48,15 +48,16 @@
       position: fixed;
       top: 10px;
       right: 10px;
+      cursor: pointer;
     }
 
     /* Logo de imagen */
     .logo-img {
-      width: 200px; /* Tamaño ajustable */
-      height: auto; /* Mantener proporciones */
+      width: 200px; 
+      height: auto; 
       margin: 0 auto;
-      display: block; /* Para que sea un bloque centrado */
-      margin-top: -90px; /* Espaciado superior */
+      display: block; 
+      margin-top: -90px; 
       margin-block: 30px;
     }
 
@@ -170,9 +171,48 @@
     .footer {
       margin-top: 20px;
     }
+
+    /* Estilo para el overlay */
+    #overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #000;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      flex-direction: column;
+    }
+
+    .overlay-content {
+      text-align: center;
+      color: #fff;
+    }
+
+    .overlay-image {
+      max-width: 90%; 
+      max-height: 50vh; 
+      margin-bottom: 20px;
+    }
+
+    .overlay-warning {
+      font-size: 1.2em;
+      color: #fff;
+      margin: 10px 0;
+    }
+
+    .overlay-sensitive {
+      font-size: 1.5em;
+      color: red;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
+  <!-- Contenedor principal -->
   <div class="container">
     <!-- Header -->
     <div class="header">
@@ -200,9 +240,6 @@
       <button type="submit" class="btn">Iniciar sesión</button>
     </form>
 
-    <!-- Mensaje de error/success -->
-    <div id="message"></div>
-
     <!-- Link para cambiar entre formularios -->
     <a href="#" id="toggle-login">¿Ya tienes cuenta? Inicia sesión aquí</a>
 
@@ -217,10 +254,14 @@
     <button class="btn-secondary" id="phone-login">
       <i class="fas fa-phone"></i> Iniciar sesión con teléfono
     </button>
+  </div>
 
-    <!-- Footer -->
-    <div class="footer">
-      <p>¿No tienes cuenta? <a href="#" id="register-link">Regístrate</a></p>
+  <!-- Contenedor del overlay -->
+  <div id="overlay">
+    <div class="overlay-content">
+      <img src="ad.png" alt="Advertencia" class="overlay-image">
+      <p class="overlay-warning">Advertencia, necesitas iniciar sesión para ver este contenido</p>
+      <p class="overlay-sensitive">Contenido sensible</p>
     </div>
   </div>
 
@@ -244,65 +285,16 @@
     const auth = getAuth(app);
 
     // Elementos del DOM
-    const registerForm = document.getElementById("register-form");
-    const loginForm = document.getElementById("login-form");
-    const toggleLogin = document.getElementById("toggle-login");
-    const message = document.getElementById("message");
-    const formTitle = document.getElementById("form-title");
+    const skipButton = document.getElementById("skip");
+    const overlay = document.getElementById("overlay");
 
-    // URL de redirección tras inicio de sesión exitoso
-    const redirectUrl = "/principal.html"; // Cambiado a archivo interno
-
-    // Cambiar entre formularios
-    toggleLogin.addEventListener("click", (e) => {
+    // Mostrar overlay al hacer clic en Skip
+    skipButton.addEventListener("click", (e) => {
       e.preventDefault();
-      if (registerForm.style.display === "block") {
-        registerForm.style.display = "none";
-        loginForm.style.display = "block";
-        formTitle.textContent = "Iniciar Sesión";
-        toggleLogin.textContent = "¿No tienes cuenta? Regístrate aquí";
-      } else {
-        registerForm.style.display = "block";
-        loginForm.style.display = "none";
-        formTitle.textContent = "Registro";
-        toggleLogin.textContent = "¿Ya tienes cuenta? Inicia sesión aquí";
-      }
-    });
-
-    // Registro de usuarios
-    registerForm.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const email = document.getElementById("register-email").value;
-      const password = document.getElementById("register-password").value;
-
-      createUserWithEmailAndPassword(auth, email, password)
-        .then(() => {
-          message.innerText = "Registro exitoso. Ahora inicia sesión.";
-          registerForm.style.display = "none";
-          loginForm.style.display = "block";
-          formTitle.textContent = "Iniciar Sesión";
-        })
-        .catch((error) => {
-          message.innerText = `Error: ${error.message}`;
-        });
-    });
-
-    // Inicio de sesión
-    loginForm.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const email = document.getElementById("login-email").value;
-      const password = document.getElementById("login-password").value;
-
-      signInWithEmailAndPassword(auth, email, password)
-        .then(() => {
-          message.innerText = "Inicio de sesión exitoso. Redirigiendo...";
-          setTimeout(() => {
-            window.location.href = redirectUrl; // Redirige al archivo interno
-          }, 1500);
-        })
-        .catch((error) => {
-          message.innerText = `Error: ${error.message}`;
-        });
+      overlay.style.display = "flex";
+      setTimeout(() => {
+        overlay.style.display = "none";
+      }, 5000); // 10 segundos
     });
   </script>
 </body>
