@@ -1,137 +1,309 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Litmatch Nudes</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
-  <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.5.0/css/font-awesome.min.css'>
-  <link rel="stylesheet" href="estilos.css">
+  <title>Login Responsivo</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
-    #protected-content {
-      display: none;
+    /* Estilo general */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
-    #redirect-message {
-      font-size: 20px;
-      color: red;
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background-color: #000;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      overflow: hidden;
+    }
+
+    /* Contenedor principal */
+    .container {
       text-align: center;
-      margin-top: 50px;
+      width: 100%;
+      max-width: 400px;
+      padding: 20px;
+    }
+
+    /* Header, Skip */
+    .header {
+      position: absolute;
+      top: 20px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .skip {
+      font-size: 0.9em;
+      color: #aaa;
+      text-decoration: none;
+      position: fixed;
+      top: 10px;
+      right: 10px;
+    }
+
+    /* Logo de imagen */
+    .logo-img {
+      width: 200px; /* Tamaño ajustable */
+      height: auto; /* Mantener proporciones */
+      margin: 0 auto;
+      display: block; /* Para que sea un bloque centrado */
+      margin-top: -90px; /* Espaciado superior */
+      margin-block: 30px;
+    }
+
+    /* Títulos */
+    h1 {
+      font-family: 'Segoe UI';
+      font-size: 1.8em;
+      margin: 0;
+    }
+
+    p {
+      font-size: 0.9em;
+      color: #aaa;
+      margin: 10px 0 20px;
+    }
+
+    /* Campos de formulario */
+    input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      background-color: #222;
+      border: none;
+      color: #fff;
+      border-radius: 10px;
+      font-size: 1em;
+      outline: none;
+    }
+
+    input::placeholder {
+      color: #aaa;
+    }
+
+    /* Botón principal */
+    .btn {
+      width: 100%;
+      padding: 12px;
+      background-color: #fff;
+      color: #000;
+      font-weight: bold;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      font-size: 1em;
+      margin-bottom: 15px;
+    }
+
+    .btn:hover {
+      background-color: #ddd;
+    }
+
+    /* Separador */
+    .divider {
+      position: relative;
+      text-align: center;
+      margin: 15px 0;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: "";
+      display: inline-block;
+      width: 40%;
+      height: 1px;
+      background-color: #444;
+      position: relative;
+      top: 8px;
+    }
+
+    .divider span {
+      font-size: 0.9em;
+      color: #aaa;
+      margin: 0 10px;
+    }
+
+    /* Botones externos */
+    .btn-secondary {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 14px;
+      margin-top: 10px;
+      background-color: #222;
+      color: #fff;
+      border-radius: 25px;
+      font-size: 1em;
+      cursor: pointer;
+      border: 1px solid #333;
+    }
+
+    .btn-secondary i {
+      margin-right: 10px;
+    }
+
+    .btn-secondary:hover {
+      background-color: #444;
+    }
+
+    /* Mensajes adicionales */
+    a {
+      color: #aaa;
+      font-size: 0.9em;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .footer {
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <a href="#" class="skip" id="skip">Skip</a>
+    </div>
 
-<div class="container" id="protected-content">
-  <span class="menu-trigger">
-    <i class="menu-trigger-bar top"></i>
-    <i class="menu-trigger-bar middle"></i>
-    <i class="menu-trigger-bar bottom"></i>
-  </span>
-  <span class="close-trigger">
-    <i class="close-trigger-bar left"></i>
-    <i class="close-trigger-bar right"></i>
-  </span>
-  <span class="logo">
-    <span>
-      <img src="0.png" alt="Logo de Instagram" class="logo-title" style="max-width: 190px; max-height: 190px; display: block; margin: auto;">
-      <i class="logo-badge">✓</i>
-    </span>
-  </span>
-  <div class="inner-container">
-    <i class="menu-bg top"></i>
-    <i class="menu-bg middle"></i>
-    <i class="menu-bg bottom"></i>
-    <div class="menu-container">
-      <ul class="menu">
-        <li><a href="#">Inicio</a></li>
-        <li><a href="the.html">Filtrados</a></li>
-        <li><a href="#">Información</a></li>
-        <li><a href="#">Aportes</a></li>
-      </ul>
+    <!-- Logo -->
+    <img src="logo/l.jpg" alt="Logo" class="logo-img">
+
+    <!-- Títulos -->
+    <h1 id="form-title">Registro</h1>
+    <p>Si no tienes tu cuenta, regístrate</p>
+
+    <!-- Formulario de registro -->
+    <form id="register-form">
+      <input type="email" placeholder="Email" id="register-email" required>
+      <input type="password" placeholder="Password" id="register-password" required>
+      <button type="submit" class="btn">Registrarse</button>
+    </form>
+
+    <!-- Formulario de login -->
+    <form id="login-form" style="display: none;">
+      <input type="email" placeholder="Email" id="login-email" required>
+      <input type="password" placeholder="Password" id="login-password" required>
+      <button type="submit" class="btn">Iniciar sesión</button>
+    </form>
+
+    <!-- Mensaje de error/success -->
+    <div id="message"></div>
+
+    <!-- Link para cambiar entre formularios -->
+    <a href="#" id="toggle-login">¿Ya tienes cuenta? Inicia sesión aquí</a>
+
+    <!-- Separador -->
+    <div class="divider"><span>o</span></div>
+
+    <!-- Botones externos -->
+    <button class="btn-secondary" id="apple-login">
+      <i class="fab fa-apple"></i> Iniciar sesión con Apple
+    </button>
+
+    <button class="btn-secondary" id="phone-login">
+      <i class="fas fa-phone"></i> Iniciar sesión con teléfono
+    </button>
+
+    <!-- Footer -->
+    <div class="footer">
+      <p>¿No tienes cuenta? <a href="#" id="register-link">Regístrate</a></p>
     </div>
   </div>
-</div>
 
-<div id="redirect-message" style="display:none;">
-  <p>Por favor, regístrate e inicia sesión para acceder a esta página.</p>
-</div>
+  <!-- Firebase y JS -->
+  <script type="module">
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
 
-<div id='links'>
-  <a id='twitter' href="#" target="_blank"><span class='fa fa-twitter'></span></a>
-  <div id='pens'>
-    <a href="#" target="_blank"><i class="fa fa-solid fa-triangle-exclamation"></i></a>Información Delicada Precaución ☣
-  </div>
-</div>
+    // Configuración de Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyDMK_0Wp87yqviKemYiN3KHpc2Nic1yZWs",
+      authDomain: "playlist-f836a.firebaseapp.com",
+      projectId: "playlist-f836a",
+      storageBucket: "playlist-f836a.firebasestorage.app",
+      messagingSenderId: "301875991366",
+      appId: "1:301875991366:web:ee46defa63138576120b47",
+      measurementId: "G-W9SM4SD0P7"
+    };
 
-<script src="https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js"></script>
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
 
-<script>
-  // Configuración de Firebase
-  const firebaseConfig = {
-    apiKey: "AIzaSyDMK_0Wp87yqviKemYiN3KHpc2Nic1yZWs",
-    authDomain: "playlist-f836a.firebaseapp.com",
-    projectId: "playlist-f836a",
-    storageBucket: "playlist-f836a.firebasestorage.app",
-    messagingSenderId: "301875991366",
-    appId: "1:301875991366:web:ee46defa63138576120b47",
-    measurementId: "G-W9SM4SD0P7"
-  };
+    // Elementos del DOM
+    const registerForm = document.getElementById("register-form");
+    const loginForm = document.getElementById("login-form");
+    const toggleLogin = document.getElementById("toggle-login");
+    const message = document.getElementById("message");
+    const formTitle = document.getElementById("form-title");
 
-  // Inicializar Firebase
-  const app = firebase.initializeApp(firebaseConfig);
-  const database = firebase.database();
-  const auth = firebase.auth();
+    // URL de redirección tras inicio de sesión exitoso
+    const redirectUrl = "principal.html"; // Cambiado a archivo interno
 
-  // Verificar si el usuario está logueado y proviene del login
-  function checkLoginStatus() {
-    const user = auth.currentUser;
-    const referrer = document.referrer;
+    // Cambiar entre formularios
+    toggleLogin.addEventListener("click", (e) => {
+      e.preventDefault();
+      if (registerForm.style.display === "block") {
+        registerForm.style.display = "none";
+        loginForm.style.display = "block";
+        formTitle.textContent = "Iniciar Sesión";
+        toggleLogin.textContent = "¿No tienes cuenta? Regístrate aquí";
+      } else {
+        registerForm.style.display = "block";
+        loginForm.style.display = "none";
+        formTitle.textContent = "Registro";
+        toggleLogin.textContent = "¿Ya tienes cuenta? Inicia sesión aquí";
+      }
+    });
 
-    // Verificar que el usuario proviene del login
-    if (!referrer.includes("loginlit.netlify.app")) {
-      // Si no proviene del login, mostrar mensaje de redirección
-      document.getElementById('protected-content').style.display = 'none';
-      document.getElementById('redirect-message').style.display = 'block';
-      setTimeout(function() {
-        window.location.href = "https://loginlit.netlify.app"; // Redirige al login si no proviene de allí
-      }, 3000);
-      return;
-    }
+    // Registro de usuarios
+    registerForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const email = document.getElementById("register-email").value;
+      const password = document.getElementById("register-password").value;
 
-    // Si el usuario está logueado, verificar si está en la base de datos
-    if (user) {
-      const userEmail = user.email;
+      createUserWithEmailAndPassword(auth, email, password)
+        .then(() => {
+          message.innerText = "Registro exitoso. Ahora inicia sesión.";
+          registerForm.style.display = "none";
+          loginForm.style.display = "block";
+          formTitle.textContent = "Iniciar Sesión";
+        })
+        .catch((error) => {
+          message.innerText = `Error: ${error.message}`;
+        });
+    });
 
-      // Verificar si el usuario está registrado en la base de datos
-      database.ref('users').orderByChild('email').equalTo(userEmail).once('value', function(snapshot) {
-        if (snapshot.exists()) {
-          // Si está registrado, mostrar el contenido
-          document.getElementById('protected-content').style.display = 'block';
-          document.getElementById('redirect-message').style.display = 'none';
-        } else {
-          // Si no está registrado, redirigir al login
-          document.getElementById('protected-content').style.display = 'none';
-          document.getElementById('redirect-message').style.display = 'block';
-          setTimeout(function() {
-            window.location.href = "https://loginlit.netlify.app"; // Redirige al login si no está registrado
-          }, 3000);
-        }
-      });
-    } else {
-      // Si no está logueado, redirigir al login
-      document.getElementById('protected-content').style.display = 'none';
-      document.getElementById('redirect-message').style.display = 'block';
-      setTimeout(function() {
-        window.location.href = "https://loginlit.netlify.app"; // Redirige al login
-      }, 3000);
-    }
-  }
+    // Inicio de sesión
+    loginForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const email = document.getElementById("login-email").value;
+      const password = document.getElementById("login-password").value;
 
-  // Llamar la función de verificación al cargar la página
-  window.onload = checkLoginStatus;
-</script>
-
+      signInWithEmailAndPassword(auth, email, password)
+        .then(() => {
+          message.innerText = "Inicio de sesión exitoso. Redirigiendo...";
+          setTimeout(() => {
+            window.location.href = redirectUrl; // Redirige al archivo interno
+          }, 1500);
+        })
+        .catch((error) => {
+          message.innerText = `Error: ${error.message}`;
+        });
+    });
+  </script>
 </body>
 </html>
