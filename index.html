@@ -7,12 +7,24 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
   <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.5.0/css/font-awesome.min.css'>
   <link rel="stylesheet" href="estilos.css">
+  <style>
+    #protected-content {
+      display: none;
+    }
+    #redirect-message {
+      font-size: 20px;
+      color: red;
+      text-align: center;
+      margin-top: 50px;
+    }
+  </style>
 </head>
 <body>
+
 <!-- partial:index.partial.html -->
 <!-- BASEN ON DRIBBBLE SHOT: https://dribbble.com/shots/2209627-UI8-Nav -->
 
-<div class="container">
+<div class="container" id="protected-content">
   <span class="menu-trigger">
     <i class="menu-trigger-bar top"></i>
     <i class="menu-trigger-bar middle"></i>
@@ -50,15 +62,44 @@
     </div>
   </div>
 </div>
-<!-- -->
+
+<!-- Mensaje de redirección si no están logueados -->
+<div id="redirect-message" style="display:none;">
+  <p>Por favor, regístrate e inicia sesión para acceder a esta página.</p>
+</div>
+
 <div id='links'>
   <a id='twitter' href="#" target="_blank"><span class='fa fa-twitter'></span></a>
   <div id='pens'><a href="#" target="_blank"><i class="fa fa-solid fa-triangle-exclamation"></i></a>Información Delicada Precaución ☣</div>
 </div>
-<!-- partial -->
+
 <script src='//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.2/jquery.min.js'></script>
 <script src='https://cdnjs.cloudflare.com/ajax/libs/gsap/1.18.2/TweenMax.min.js'></script>
 <script src='https://cdnjs.cloudflare.com/ajax/libs/gsap/1.18.2/TimelineMax.min.js'></script>
 <script  src="script.js"></script>
+
+<script>
+  // Verificar si el usuario ha iniciado sesión
+  function checkLoginStatus() {
+    const isLoggedIn = localStorage.getItem("isLoggedIn");
+
+    if (isLoggedIn === "true") {
+      // Si está logueado, mostrar el contenido protegido
+      document.getElementById('protected-content').style.display = 'block';
+      document.getElementById('redirect-message').style.display = 'none';
+    } else {
+      // Si no está logueado, mostrar el mensaje de redirección y ocultar el contenido
+      document.getElementById('protected-content').style.display = 'none';
+      document.getElementById('redirect-message').style.display = 'block';
+      // Redirigir a la página de login después de un corto periodo
+      setTimeout(function() {
+        window.location.href = "https://loginlit.netlify.app"; // Cambia la URL de tu página de login
+      }, 3000); // Redirige después de 3 segundos
+    }
+  }
+
+  // Llamar la función al cargar la página
+  window.onload = checkLoginStatus;
+</script>
 </body>
 </html>
