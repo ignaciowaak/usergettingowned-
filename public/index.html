@@ -390,11 +390,9 @@ registerForm.addEventListener("submit", async (e) => {
   // Crear un nuevo usuario
   createUserWithEmailAndPassword(auth, email, password)
     .then((userCredential) => {
-      message.textContent = "Registro exitoso. Redirigiendo...";
+      message.textContent = "Registro exitoso. Ahora inicia sesión.";
       message.style.color = "green";
-      setTimeout(() => {
-        window.location.href = redirectUrl;
-      }, 2000);
+      // Aquí eliminamos la redirección
     })
     .catch((error) => {
       message.textContent = "Error: " + error.message;
