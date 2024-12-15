@@ -7,26 +7,12 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
   <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.5.0/css/font-awesome.min.css'>
   <link rel="stylesheet" href="estilos.css">
-  <style>
-    #protected-content {
-      display: none;
-    }
-    #redirect-message {
-      font-size: 20px;
-      color: red;
-      text-align: center;
-      margin-top: 50px;
-      background-color: #ffcccc; /* Color de fondo rojo claro */
-      padding: 20px;
-      border: 2px solid red;
-      border-radius: 10px;
-    }
-  </style>
 </head>
 <body>
+<!-- partial:index.partial.html -->
+<!-- BASEN ON DRIBBBLE SHOT: https://dribbble.com/shots/2209627-UI8-Nav -->
 
-<!-- Contenido protegido que se muestra solo cuando el usuario está autenticado -->
-<div class="container" id="protected-content">
+<div class="container">
   <span class="menu-trigger">
     <i class="menu-trigger-bar top"></i>
     <i class="menu-trigger-bar middle"></i>
@@ -48,96 +34,34 @@
     <i class="menu-bg bottom"></i>
     <div class="menu-container">
       <ul class="menu">
-        <li><a href="#">Inicio</a></li>
-        <li><a href="the.html">Filtrados</a></li>
-        <li><a href="#">Información</a></li>
-        <li><a href="#">Aportes</a></li>
+        <li>
+          <a href="#">Inicio</a>
+        </li>
+        <li>
+          <a href="the.html">Filtrados</a>
+        </li>
+        <li>
+          <a href="#">Información</a>
+        </li>
+        <li>
+          <a href="#">Aportes</a>
+        </li>
       </ul>
     </div>
   </div>
 </div>
-
-<!-- Mensaje de advertencia si no está logueado o no proviene del login -->
-<div id="redirect-message" style="display:none;">
-  <p>Por favor, regístrate e inicia sesión para acceder a esta página.</p>
-</div>
-
+<!-- -->
 <div id='links'>
   <a id='twitter' href="#" target="_blank"><span class='fa fa-twitter'></span></a>
-  <div id='pens'>
-    <a href="#" target="_blank"><i class="fa fa-solid fa-triangle-exclamation"></i></a>Información Delicada Precaución ☣
-  </div>
+  <div id='pens'><a href="#" target="_blank"><i class="fa fa-solid fa-triangle-exclamation"></i></a>Información Delicada Precaución ☣</div>
 </div>
-
-<script src="https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js"></script>
-
-<script>
-  // Configuración de Firebase
-  const firebaseConfig = {
-    apiKey: "AIzaSyDMK_0Wp87yqviKemYiN3KHpc2Nic1yZWs",
-    authDomain: "playlist-f836a.firebaseapp.com",
-    projectId: "playlist-f836a",
-    storageBucket: "playlist-f836a.firebasestorage.app",
-    messagingSenderId: "301875991366",
-    appId: "1:301875991366:web:ee46defa63138576120b47",
-    measurementId: "G-W9SM4SD0P7"
-  };
-
-  // Inicializar Firebase
-  const app = firebase.initializeApp(firebaseConfig);
-  const database = firebase.database();
-  const auth = firebase.auth();
-
-  // Verificar si el usuario está logueado y proviene del login
-  function checkLoginStatus() {
-    const user = auth.currentUser;
-    const referrer = document.referrer;
-
-    // Verificar que el usuario proviene del login
-    if (!referrer.includes("loginlit.netlify.app")) {
-      // Si no proviene del login, mostrar mensaje de redirección
-      document.getElementById('protected-content').style.display = 'none';
-      document.getElementById('redirect-message').style.display = 'block';
-      setTimeout(function() {
-        window.location.href = "https://loginlit.netlify.app"; // Redirige al login si no proviene de allí
-      }, 3000);
-      return;
-    }
-
-    // Si el usuario está logueado, verificar si está en la base de datos
-    if (user) {
-      const userEmail = user.email;
-
-      // Verificar si el usuario está registrado en la base de datos
-      database.ref('users').orderByChild('email').equalTo(userEmail).once('value', function(snapshot) {
-        if (snapshot.exists()) {
-          // Si está registrado, mostrar el contenido
-          document.getElementById('protected-content').style.display = 'block';
-          document.getElementById('redirect-message').style.display = 'none';
-        } else {
-          // Si no está registrado, redirigir al login
-          document.getElementById('protected-content').style.display = 'none';
-          document.getElementById('redirect-message').style.display = 'block';
-          setTimeout(function() {
-            window.location.href = "https://loginlit.netlify.app"; // Redirige al login si no está registrado
-          }, 3000);
-        }
-      });
-    } else {
-      // Si no está logueado, redirigir al login
-      document.getElementById('protected-content').style.display = 'none';
-      document.getElementById('redirect-message').style.display = 'block';
-      setTimeout(function() {
-        window.location.href = "https://loginlit.netlify.app"; // Redirige al login
-      }, 3000);
-    }
-  }
-
-  // Llamar la función de verificación al cargar la página
-  window.onload = checkLoginStatus;
-</script>
-
+<!-- partial -->
+<script src='//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.2/jquery.min.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/gsap/1.18.2/TweenMax.min.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/gsap/1.18.2/TimelineMax.min.js'></script>
+<script  src="script.js"></script>
 </body>
 </html>
+
+
+Hacelo es esta página 
