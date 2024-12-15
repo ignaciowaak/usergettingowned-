@@ -48,16 +48,15 @@
       position: fixed;
       top: 10px;
       right: 10px;
-      cursor: pointer;
     }
 
     /* Logo de imagen */
     .logo-img {
-      width: 200px; 
-      height: auto; 
+      width: 200px;
+      height: auto;
       margin: 0 auto;
-      display: block; 
-      margin-top: -90px; 
+      display: block;
+      margin-top: -90px;
       margin-block: 30px;
     }
 
@@ -172,7 +171,7 @@
       margin-top: 20px;
     }
 
-    /* Estilo para el overlay */
+    /* Fondo negro con advertencia */
     #overlay {
       position: fixed;
       top: 0;
@@ -212,7 +211,6 @@
   </style>
 </head>
 <body>
-  <!-- Contenedor principal -->
   <div class="container">
     <!-- Header -->
     <div class="header">
@@ -240,6 +238,9 @@
       <button type="submit" class="btn">Iniciar sesión</button>
     </form>
 
+    <!-- Mensaje de error/success -->
+    <div id="message"></div>
+
     <!-- Link para cambiar entre formularios -->
     <a href="#" id="toggle-login">¿Ya tienes cuenta? Inicia sesión aquí</a>
 
@@ -254,6 +255,11 @@
     <button class="btn-secondary" id="phone-login">
       <i class="fas fa-phone"></i> Iniciar sesión con teléfono
     </button>
+
+    <!-- Footer -->
+    <div class="footer">
+      <p>¿No tienes cuenta? <a href="#" id="register-link">Regístrate</a></p>
+    </div>
   </div>
 
   <!-- Contenedor del overlay -->
@@ -265,37 +271,171 @@
     </div>
   </div>
 
-  <!-- Firebase y JS -->
   <script type="module">
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, fetchSignInMethodsForEmail } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
 
-    // Configuración de Firebase
-    const firebaseConfig = {
-      apiKey: "AIzaSyDMK_0Wp87yqviKemYiN3KHpc2Nic1yZWs",
-      authDomain: "playlist-f836a.firebaseapp.com",
-      projectId: "playlist-f836a",
-      storageBucket: "playlist-f836a.firebasestorage.app",
-      messagingSenderId: "301875991366",
-      appId: "1:301875991366:web:ee46defa63138576120b47",
-      measurementId: "G-W9SM4SD0P7"
-    };
+// Configuración de Firebase
+const firebaseConfig = {
+  apiKey: "AIzaSyDMK_0Wp87yqviKemYiN3KHpc2Nic1yZWs",
+  authDomain: "playlist-f836a.firebaseapp.com",
+  projectId: "playlist-f836a",
+  storageBucket: "playlist-f836a.firebasestorage.app",
+  messagingSenderId: "301875991366",
+  appId: "1:301875991366:web:ee46defa63138576120b47",
+  measurementId: "G-W9SM4SD0P7"
+};
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 
-    // Elementos del DOM
-    const skipButton = document.getElementById("skip");
-    const overlay = document.getElementById("overlay");
+// Elementos del DOM
+const registerForm = document.getElementById("register-form");
+const loginForm = document.getElementById("login-form");
+const toggleLogin = document.getElementById("toggle-login");
+const message = document.getElementById("message");
+const formTitle = document.getElementById("form-title");
+const skipButton = document.getElementById("skip");
+const overlay = document.getElementById("overlay");
+const registerEmailInput = document.getElementById("register-email");
+const registerPasswordInput = document.getElementById("register-password");
+const passwordRequirements = document.getElementById("password-requirements");
+const passwordIcon = document.getElementById("password-icon");
 
-    // Mostrar overlay al hacer clic en Skip
-    skipButton.addEventListener("click", (e) => {
-      e.preventDefault();
-      overlay.style.display = "flex";
-      setTimeout(() => {
-        overlay.style.display = "none";
-      }, 5000); // 10 segundos
+const redirectUrl = "/principal.html";  // URL de redirección tras inicio de sesión exitoso
+
+// Cambiar entre formularios
+toggleLogin.addEventListener("click", (e) => {
+  e.preventDefault();
+  if (registerForm.style.display === "none") {
+    registerForm.style.display = "block";
+    loginForm.style.display = "none";
+    formTitle.textContent = "Registro";
+    toggleLogin.textContent = "¿Ya tienes cuenta? Inicia sesión aquí";
+  } else {
+    registerForm.style.display = "none";
+    loginForm.style.display = "block";
+    formTitle.textContent = "Iniciar sesión";
+    toggleLogin.textContent = "¿No tienes cuenta? Regístrate aquí";
+  }
+});
+
+// Función para validar el correo electrónico (solo Gmail personal)
+function validateEmail(email) {
+  const gmailPattern = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+  return gmailPattern.test(email);
+}
+
+// Función para validar la contraseña
+function validatePassword(password) {
+  const lengthCheck = password.length >= 8;
+  const lowercaseCheck = /[a-z]/.test(password);
+  const uppercaseCheck = /[A-Z]/.test(password);
+  const numberCheck = /[0-9]/.test(password);
+  const noSequentialNumbers = !/(012|123|234|345|456|567|678|789|890)/.test(password);
+
+  return lengthCheck && lowercaseCheck && uppercaseCheck && numberCheck && noSequentialNumbers;
+}
+
+// Verificar que el Gmail no esté registrado previamente
+function checkIfEmailExists(email) {
+  return fetchSignInMethodsForEmail(auth, email)
+    .then((methods) => {
+      return methods.length > 0;  // Si el array tiene métodos, el correo ya está registrado
     });
+}
+
+// Mostrar los requisitos de la contraseña y el estado
+function updatePasswordStatus(password) {
+  const isValid = validatePassword(password);
+  const icon = document.getElementById("password-icon");
+
+  if (isValid) {
+    icon.classList.add("valid");
+    icon.classList.remove("invalid");
+  } else {
+    icon.classList.add("invalid");
+    icon.classList.remove("valid");
+  }
+}
+
+// Registro de usuarios
+registerForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const email = registerEmailInput.value;
+  const password = registerPasswordInput.value;
+
+  // Verificar si el correo es un Gmail personal
+  if (!validateEmail(email)) {
+    message.textContent = "Por favor, usa tu Gmail personal para registrarte.";
+    message.style.color = "red";
+    return;
+  }
+
+  // Verificar si la contraseña es segura
+  if (!validatePassword(password)) {
+    message.textContent = "La contraseña debe tener al menos 8 caracteres, una mayúscula, un número, y no debe contener números consecutivos.";
+    message.style.color = "red";
+    return;
+  }
+
+  // Verificar si el correo ya está registrado
+  const emailExists = await checkIfEmailExists(email);
+  if (emailExists) {
+    message.textContent = "Este correo ya está registrado. Intenta con otro.";
+    message.style.color = "red";
+    return;
+  }
+
+  // Crear un nuevo usuario
+  createUserWithEmailAndPassword(auth, email, password)
+    .then((userCredential) => {
+      message.textContent = "Registro exitoso. Redirigiendo...";
+      message.style.color = "green";
+      setTimeout(() => {
+        window.location.href = redirectUrl;
+      }, 2000);
+    })
+    .catch((error) => {
+      message.textContent = "Error: " + error.message;
+      message.style.color = "red";
+    });
+});
+
+// Inicio de sesión de usuarios
+loginForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const email = document.getElementById("login-email").value;
+  const password = document.getElementById("login-password").value;
+
+  signInWithEmailAndPassword(auth, email, password)
+    .then((userCredential) => {
+      message.textContent = "Inicio de sesión exitoso. Redirigiendo...";
+      message.style.color = "green";
+      setTimeout(() => {
+        window.location.href = redirectUrl;
+      }, 2000);
+    })
+    .catch((error) => {
+      message.textContent = "Error: " + error.message;
+      message.style.color = "red";
+    });
+});
+
+// Funcionalidad del botón Skip
+skipButton.addEventListener("click", (e) => {
+  e.preventDefault();
+  overlay.style.display = "flex";
+  setTimeout(() => {
+    overlay.style.display = "none";
+  }, 4000); // Desaparece en 10 segundos
+});
+
+// Verificar contraseña mientras se escribe
+registerPasswordInput.addEventListener("input", (e) => {
+  const password = e.target.value;
+  updatePasswordStatus(password);
+});
   </script>
 </body>
 </html>
